@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class EtapesPage extends StatefulWidget {
-  const EtapesPage({super.key});
+class pausesPage extends StatefulWidget {
+  const pausesPage({super.key});
 
   @override
-  _EtapesPageState createState() => _EtapesPageState();
+  _pausesPageState createState() => _pausesPageState();
 }
 
-class _EtapesPageState extends State<EtapesPage> {
+class _pausesPageState extends State<pausesPage> {
   DateTime selectedDate = DateTime.now();
-  int etapes = 0;
+  int pauses = 0;
   final List<String> addedValues = [];
 
   Future<void> _selectDate(BuildContext context) async {
@@ -49,7 +49,7 @@ class _EtapesPageState extends State<EtapesPage> {
             end: Alignment.bottomRight,
           ).createShader(bounds),
           child: const Text(
-            'Étapes',
+            'Pause',
             style: TextStyle(
               color: Colors.white, // La couleur de base sera masquée par le ShaderMask
               fontSize: 24,
@@ -58,7 +58,7 @@ class _EtapesPageState extends State<EtapesPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -66,13 +66,13 @@ class _EtapesPageState extends State<EtapesPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+              colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black54,
+                color: Color.fromARGB(133, 226, 226, 226),
                 offset: Offset(0, 3),
                 blurRadius: 5,
               ),
@@ -83,7 +83,7 @@ class _EtapesPageState extends State<EtapesPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+            colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -116,10 +116,10 @@ class _EtapesPageState extends State<EtapesPage> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          etapes++;
+                          pauses++;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_up, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_up, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
@@ -128,7 +128,7 @@ class _EtapesPageState extends State<EtapesPage> {
                         end: Alignment.bottomRight,
                       ).createShader(bounds),
                       child: Text(
-                        '$etapes Étapes',
+                        '$pauses Pause(s)',
                         style: const TextStyle(
                           color: Colors.white, // La couleur de base sera masquée par le ShaderMask
                           fontSize: 24,
@@ -139,10 +139,10 @@ class _EtapesPageState extends State<EtapesPage> {
                     IconButton(
                       onPressed: () {
                         setState(() {
-                          if (etapes > 0) etapes--;
+                          if (pauses > 0) pauses--;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                   ],
                 ),
@@ -150,20 +150,24 @@ class _EtapesPageState extends State<EtapesPage> {
                 ElevatedButton(
                   onPressed: () {
                     // Logique du bouton Valider
-                    _addValue("Date: ${selectedDate.toLocal()}, Étapes: $etapes");
-                    print("Date: ${selectedDate.toLocal()}, Étapes: $etapes");
+                    _addValue("Date: ${selectedDate.toLocal()}, Étapes: $pauses");
+                    print("Date: ${selectedDate.toLocal()}, Étapes: $pauses");
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[800],
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text("Valider"),
-                ),
+                  child: const Text(
+                    "Valider",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),                ),
                 const SizedBox(height: 40),
                 // Tableau des valeurs ajoutées
                 const Text(
                   "Valeurs ajoutées :",
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -174,7 +178,7 @@ class _EtapesPageState extends State<EtapesPage> {
                       return ListTile(
                         title: Text(
                           addedValues[index],
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                         ),
                       );
                     },

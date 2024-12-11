@@ -58,7 +58,7 @@ class _NuitsPageState extends State<NuitsPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -66,13 +66,13 @@ class _NuitsPageState extends State<NuitsPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+              colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black54,
+                color: Color.fromARGB(133, 226, 226, 226),
                 offset: Offset(0, 3),
                 blurRadius: 5,
               ),
@@ -83,7 +83,7 @@ class _NuitsPageState extends State<NuitsPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+            colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -119,7 +119,7 @@ class _NuitsPageState extends State<NuitsPage> {
                           nuits++;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_up, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_up, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
@@ -142,7 +142,7 @@ class _NuitsPageState extends State<NuitsPage> {
                           if (nuits > 0) nuits--;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                   ],
                 ),
@@ -154,16 +154,20 @@ class _NuitsPageState extends State<NuitsPage> {
                     print("Date: ${selectedDate.toLocal()}, Nuits: $nuits");
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[800],
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text("Valider"),
-                ),
+                  child: const Text(
+                    "Valider",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),                ),
                 const SizedBox(height: 40),
                 // Tableau des valeurs ajoutées
                 const Text(
                   "Valeurs ajoutées :",
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -174,7 +178,7 @@ class _NuitsPageState extends State<NuitsPage> {
                       return ListTile(
                         title: Text(
                           addedValues[index],
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                         ),
                       );
                     },

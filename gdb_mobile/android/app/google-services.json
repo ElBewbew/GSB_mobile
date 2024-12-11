@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "273030084006",
+    "project_id": "projet-gsb",
+    "storage_bucket": "projet-gsb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273030084006:android:36a816fe541c5e7ecb0b67",
+        "android_client_info": {
+          "package_name": "com.gsb.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3c98cHf9d81WYtuQ8WMHo2Ze0C1jCkKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -58,7 +58,7 @@ class _RepasPageState extends State<RepasPage> {
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0)),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -66,13 +66,13 @@ class _RepasPageState extends State<RepasPage> {
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+              colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black54,
+                color: Color.fromARGB(133, 226, 226, 226),
                 offset: Offset(0, 3),
                 blurRadius: 5,
               ),
@@ -83,7 +83,7 @@ class _RepasPageState extends State<RepasPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+            colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -98,7 +98,7 @@ class _RepasPageState extends State<RepasPage> {
                 GestureDetector(
                   onTap: () => _selectDate(context),
                   child: Card(
-                    color: Colors.grey[800],
+                    color: const Color.fromRGBO(148, 148, 148, 1),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
@@ -119,7 +119,7 @@ class _RepasPageState extends State<RepasPage> {
                           repas++;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_up, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_up, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                     ShaderMask(
                       shaderCallback: (bounds) => const LinearGradient(
@@ -142,7 +142,7 @@ class _RepasPageState extends State<RepasPage> {
                           if (repas > 0) repas--;
                         });
                       },
-                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white, size: 48),
+                      icon: const Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 0, 0, 0), size: 48),
                     ),
                   ],
                 ),
@@ -154,16 +154,21 @@ class _RepasPageState extends State<RepasPage> {
                     print("Date: ${selectedDate.toLocal()}, Repas: $repas");
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey[800],
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   ),
-                  child: const Text("Valider"),
+                  child: const Text(
+                    "Valider",
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 40),
                 // Tableau des valeurs ajoutées
                 const Text(
                   "Valeurs ajoutées :",
-                  style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 Container(
@@ -174,7 +179,7 @@ class _RepasPageState extends State<RepasPage> {
                       return ListTile(
                         title: Text(
                           addedValues[index],
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
                         ),
                       );
                     },
