@@ -247,7 +247,6 @@ class _KmPageState extends State<KmPage> {
                         } else {
 
                           insertValue = false;
-
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Veuillez entrer un nombre de kilomètres valide."),
@@ -255,7 +254,6 @@ class _KmPageState extends State<KmPage> {
                             ),
                           );
                         }
-
 
                         if (_priceController.text.isNotEmpty) {
                           

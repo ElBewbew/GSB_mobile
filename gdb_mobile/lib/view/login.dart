@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../main.dart';
+
+
+
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color.fromARGB(255, 18, 18, 18), Color.fromARGB(255, 45, 45, 45)],
+            colors: [Color.fromARGB(255, 255, 255, 255), Color.fromARGB(255, 255, 255, 255)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -59,12 +65,12 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       hintText: 'Nom d\'utilisateur',
                       filled: true,
-                      fillColor: Colors.grey[800],
+                      fillColor: const Color.fromARGB(255, 190, 190, 190),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
                       ),
-                      hintStyle: const TextStyle(color: Colors.white54),
+                      hintStyle: const TextStyle(color: Color.fromARGB(137, 255, 255, 255)),
                     ),
                     style: const TextStyle(color: Colors.white),
                   ),
@@ -76,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                     decoration: InputDecoration(
                       hintText: 'Mot de passe',
                       filled: true,
-                      fillColor: Colors.grey[800],
+                      fillColor: const Color.fromARGB(255, 190, 190, 190),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -88,12 +94,16 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
                   // Bouton de connexion
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       // Logique de connexion
+
+
+                      checkIfEmailMdpExists(context, _usernameController.text, _passwordController.text);
+
                       print("Nom d'utilisateur: ${_usernameController.text}, Mot de passe: ${_passwordController.text}");
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
+                      backgroundColor: const Color.fromARGB(255, 204, 204, 204),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     ),
                     child: const Text("Connexion"),
@@ -105,5 +115,57 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+}
+
+Future<bool> checkIfEmailMdpExists(BuildContext context, String email, String mdp) async {
+  try {
+    // Référence à la collection 'users' dans Firestore
+    CollectionReference users = FirebaseFirestore.instance.collection('utilisateur');
+    
+    // Recherche l'utilisateur avec l'email spécifié
+    QuerySnapshot querySnapshot = await users.where('Email', isEqualTo: email).get();
+
+    // Si on trouve des résultats, on retourne le premier document
+    if (querySnapshot.docs.isNotEmpty) {
+      
+      var user = querySnapshot.docs.first;  // Retourne le premier utilisateur trouvé
+    
+      // Comparaison du mot de passe
+      String storedPassword = user['mdp'];  // On récupère le mot de passe de Firestore
+      if (storedPassword == mdp) {
+
+        // Si le mot de passe est correct, on redirige vers la page d'accueil
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()), // Remplace avec la page principale
+        );
+        return true;  // Le mot de passe correspond
+      
+      } else {
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Le mot de passe ne correspond pas"),
+            duration: Duration(seconds: 2), // Durée du SnackBar
+          ),
+        );
+
+        return false; // Le mot de passe ne correspond pas
+      }
+
+    } else {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Aucun utilisateur trouvé"),
+          duration: Duration(seconds: 2), // Durée du SnackBar
+        ),
+      );
+      return false;  // Aucun utilisateur trouvé
+    }
+  } catch (e) {
+    print('Erreur de recherche dans Firestore : $e');
+    return false;
   }
 }
