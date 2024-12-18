@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NuitsPage extends StatefulWidget {
   const NuitsPage({super.key});
@@ -10,7 +11,6 @@ class NuitsPage extends StatefulWidget {
 class _NuitsPageState extends State<NuitsPage> {
   DateTime selectedDate = DateTime.now();
   int nuits = 0;
-  final List<String> addedValues = [];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -20,7 +20,7 @@ class _NuitsPageState extends State<NuitsPage> {
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.dark(), // This will change to dark theme.
+          data: ThemeData.dark(),
           child: child!,
         );
       },
@@ -32,10 +32,24 @@ class _NuitsPageState extends State<NuitsPage> {
     }
   }
 
-  void _addValue(String value) {
-    setState(() {
-      addedValues.add(value);
-    });
+  Future<void> _saveNuitsToFirebase() async {
+    String date = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+    DateTime dateTimeNow = DateTime.now();
+    String heure = "${dateTimeNow.year}-${dateTimeNow.month.toString().padLeft(2, '0')}-${dateTimeNow.day.toString().padLeft(2, '0')}/${dateTimeNow.hour.toString().padLeft(2, '0')}:${dateTimeNow.minute.toString().padLeft(2, '0')}";
+    String montant = (nuits * 47.5).toStringAsFixed(2);
+
+    try {
+      await FirebaseFirestore.instance.collection('noteFrais').add({
+        'type': 'Nuits',
+        'dateHeureValidation': date,
+        'heureValidation': heure,
+        'montant': montant,
+        'nuits': nuits.toString(),
+      });
+      print("Nuits updated successfully!");
+    } catch (e) {
+      print("Error updating nuits: $e");
+    }
   }
 
   @override
@@ -90,101 +104,86 @@ class _NuitsPageState extends State<NuitsPage> {
         ),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Sélection de la date
-                GestureDetector(
-                  onTap: () => _selectDate(context),
-                  child: Card(
-                    color: Colors.grey[800],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        "${selectedDate.toLocal()}".split(' ')[0],
-                        style: const TextStyle(color: Colors.white, fontSize: 24),
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.calendar_today, color: Color.fromARGB(255, 0, 0, 0)),
+                        onPressed: () => _selectDate(context),
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Sélection des nuits
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          nuits++;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_up, color: Color.fromARGB(255, 0, 0, 0), size: 48),
-                    ),
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Colors.blue, Colors.green],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        '$nuits Nuits',
+                      Text(
+                        "Date : ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
                         style: const TextStyle(
-                          color: Colors.white, // La couleur de base sera masquée par le ShaderMask
-                          fontSize: 24,
+                          color: Colors.black,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          if (nuits > 0) nuits--;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 0, 0, 0), size: 48),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () {
-                    // Logique du bouton Valider
-                    _addValue("Date: ${selectedDate.toLocal()}, Nuits: $nuits");
-                    print("Date: ${selectedDate.toLocal()}, Nuits: $nuits");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ],
                   ),
-                  child: const Text(
-                    "Valider",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ),                ),
-                const SizedBox(height: 40),
-                // Tableau des valeurs ajoutées
-                const Text(
-                  "Valeurs ajoutées :",
-                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: 200,
-                  child: ListView.builder(
-                    itemCount: addedValues.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          addedValues[index],
-                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            nuits++;
+                          });
+                        },
+                        icon: const Icon(Icons.arrow_drop_up, color: Colors.black, size: 48),
+                      ),
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Colors.blue, Colors.green],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          '$nuits Nuits',
+                          style: const TextStyle(
+                            color: Colors.white, // La couleur de base sera masquée par le ShaderMask
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      );
-                    },
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (nuits > 0) nuits--;
+                          });
+                        },
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.black, size: 48),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _saveNuitsToFirebase,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "Valider",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

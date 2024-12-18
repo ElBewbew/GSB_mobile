@@ -20,7 +20,7 @@ class _HorsFPageState extends State<HorsFPage> {
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.dark(), // This will change to dark theme.
+          data: ThemeData.dark(),
           child: child!,
         );
       },

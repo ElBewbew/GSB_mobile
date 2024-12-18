@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class pausesPage extends StatefulWidget {
-  const pausesPage({super.key});
+class PausesPage extends StatefulWidget {
+  const PausesPage({super.key});
 
   @override
-  _pausesPageState createState() => _pausesPageState();
+  _PausesPageState createState() => _PausesPageState();
 }
 
-class _pausesPageState extends State<pausesPage> {
+class _PausesPageState extends State<PausesPage> {
   DateTime selectedDate = DateTime.now();
   int pauses = 0;
-  final List<String> addedValues = [];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -20,7 +20,7 @@ class _pausesPageState extends State<pausesPage> {
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.dark(), // This will change to dark theme.
+          data: ThemeData.dark(), 
           child: child!,
         );
       },
@@ -32,10 +32,24 @@ class _pausesPageState extends State<pausesPage> {
     }
   }
 
-  void _addValue(String value) {
-    setState(() {
-      addedValues.add(value);
-    });
+  Future<void> _savePausesToFirebase() async {
+    String date = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+    DateTime dateTimeNow = DateTime.now();
+    String heure = "${dateTimeNow.year}-${dateTimeNow.month.toString().padLeft(2, '0')}-${dateTimeNow.day.toString().padLeft(2, '0')}/${dateTimeNow.hour.toString().padLeft(2, '0')}:${dateTimeNow.minute.toString().padLeft(2, '0')}";
+    String montant = (pauses * 5.0).toStringAsFixed(2);
+
+    try {
+      await FirebaseFirestore.instance.collection('noteFrais').add({
+        'type': 'Pause',
+        'dateHeureValidation': date,
+        'heureValidation': heure,
+        'montant': montant,
+        'pauses': pauses.toString(),
+      });
+      print("Pauses updated successfully!");
+    } catch (e) {
+      print("Error updating pauses: $e");
+    }
   }
 
   @override
@@ -90,101 +104,86 @@ class _pausesPageState extends State<pausesPage> {
         ),
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Sélection de la date
-                GestureDetector(
-                  onTap: () => _selectDate(context),
-                  child: Card(
-                    color: Colors.grey[800],
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        "${selectedDate.toLocal()}".split(' ')[0],
-                        style: const TextStyle(color: Colors.white, fontSize: 24),
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.calendar_today, color: Color.fromARGB(255, 0, 0, 0)),
+                        onPressed: () => _selectDate(context),
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Sélection des étapes
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          pauses++;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_up, color: Color.fromARGB(255, 0, 0, 0), size: 48),
-                    ),
-                    ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [Colors.blue, Colors.green],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ).createShader(bounds),
-                      child: Text(
-                        '$pauses Pause(s)',
+                      Text(
+                        "Date : ${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
                         style: const TextStyle(
-                          color: Colors.white, // La couleur de base sera masquée par le ShaderMask
-                          fontSize: 24,
+                          color: Colors.black,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          if (pauses > 0) pauses--;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_down, color: Color.fromARGB(255, 0, 0, 0), size: 48),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 40),
-                ElevatedButton(
-                  onPressed: () {
-                    // Logique du bouton Valider
-                    _addValue("Date: ${selectedDate.toLocal()}, Étapes: $pauses");
-                    print("Date: ${selectedDate.toLocal()}, Étapes: $pauses");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    ],
                   ),
-                  child: const Text(
-                    "Valider",
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ),                ),
-                const SizedBox(height: 40),
-                // Tableau des valeurs ajoutées
-                const Text(
-                  "Valeurs ajoutées :",
-                  style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  height: 200,
-                  child: ListView.builder(
-                    itemCount: addedValues.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          addedValues[index],
-                          style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            pauses++;
+                          });
+                        },
+                        icon: const Icon(Icons.arrow_drop_up, color: Colors.black, size: 48),
+                      ),
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Colors.blue, Colors.green],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          '$pauses Pause(s)',
+                          style: const TextStyle(
+                            color: Colors.white, // La couleur de base sera masquée par le ShaderMask
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      );
-                    },
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (pauses > 0) pauses--;
+                          });
+                        },
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.black, size: 48),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _savePausesToFirebase,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Text(
+                      "Valider",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 class KmPage extends StatefulWidget {
   const KmPage({super.key});
@@ -14,10 +11,6 @@ class KmPage extends StatefulWidget {
 class _KmPageState extends State<KmPage> {
   DateTime selectedDate = DateTime.now();
   int kilometers = 0;
-  final List<String> addedValues = [];
-  bool showCustomFields = false;
-  final TextEditingController _kmController = TextEditingController();
-  final TextEditingController _priceController = TextEditingController();
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -27,7 +20,7 @@ class _KmPageState extends State<KmPage> {
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.dark(), // This will change to dark theme.
+          data: ThemeData.dark(),
           child: child!,
         );
       },
@@ -39,10 +32,24 @@ class _KmPageState extends State<KmPage> {
     }
   }
 
-  void _addValue(String value) {
-    setState(() {
-      addedValues.add(value);
-    });
+  Future<void> _saveKilometersToFirebase() async {
+    String date = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+    DateTime dateTimeNow = DateTime.now();
+    String heure = "${dateTimeNow.year}-${dateTimeNow.month.toString().padLeft(2, '0')}-${dateTimeNow.day.toString().padLeft(2, '0')}/${dateTimeNow.hour.toString().padLeft(2, '0')}:${dateTimeNow.minute.toString().padLeft(2, '0')}";
+    String montant = (kilometers * 1.10).toStringAsFixed(2);
+
+    try {
+      await FirebaseFirestore.instance.collection('noteFrais').add({
+        'type': 'Trajet',
+        'dateOperation': date,
+        'dateHeureValidation': heure,
+        'montant': montant,
+        'kilometres': kilometers.toString(),
+      });
+      print("Kilometers updated successfully!");
+    } catch (e) {
+      print("Error updating kilometers: $e");
+    }
   }
 
   @override
@@ -119,195 +126,62 @@ class _KmPageState extends State<KmPage> {
                       ),
                     ],
                   ),
-         
                   const SizedBox(height: 20),
-                  AnimatedOpacity(
-                    opacity: showCustomFields ? 0.0 : 1.0,
-                    duration: const Duration(milliseconds: 500),
-                    child: Column(
-                      children: [
-                        ShaderMask(
-                          shaderCallback: (bounds) => const LinearGradient(
-                            colors: [Colors.blue, Colors.green],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ).createShader(bounds),
-                          child: const Text(
-                            'En forfait (1.10 euros par km).',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  kilometers++;
-                                });
-                              },
-                              icon: const Icon(Icons.arrow_drop_up, color: Colors.black, size: 48),
-                            ),
-                            ShaderMask(
-                              shaderCallback: (bounds) => const LinearGradient(
-                                colors: [Colors.blue, Colors.green],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ).createShader(bounds),
-                              child: Text(
-                                '$kilometers Km',
-                                style: const TextStyle(
-                                  color: Colors.white, // La couleur de base sera masquée par le ShaderMask
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (kilometers > 0) kilometers--;
-                                });
-                              },
-                              icon: const Icon(Icons.arrow_drop_down, color: Colors.black, size: 48),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                  child: Column(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        showCustomFields
-                            ? "Passer en forfait"
-                            : "Passer en hors forfait",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.black, // Vous pouvez personnaliser la couleur
-                        ),
-                      ),
-                      Switch(
-                        value: showCustomFields,
-                        onChanged: (bool value) {
+                      IconButton(
+                        onPressed: () {
                           setState(() {
-                            showCustomFields = value;
+                            kilometers++;
                           });
                         },
+                        icon: const Icon(Icons.arrow_drop_up, color: Colors.black, size: 48),
+                      ),
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [Colors.blue, Colors.green],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          '$kilometers Km',
+                          style: const TextStyle(
+                            color: Colors.white, // La couleur de base sera masquée par le ShaderMask
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            if (kilometers > 0) kilometers--;
+                          });
+                        },
+                        icon: const Icon(Icons.arrow_drop_down, color: Colors.black, size: 48),
                       ),
                     ],
                   ),
-                ),
-                  AnimatedOpacity(
-                    opacity: showCustomFields ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 500),
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: _kmController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            hintText: 'Entrez les kilomètres parcourus',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _priceController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            hintText: 'Entrez le prix total payé',
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () async {
-                      bool insertValue = true;
-                      String prix = "vide";
-                      int km = 0;
-
-                      if (showCustomFields) {km = kilometers;
-
-
-                        if (_kmController.text.isNotEmpty) {
-                          
-                          km = int.tryParse(_kmController.text) ?? 0;
-
-                        } else {
-
-                          insertValue = false;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Veuillez entrer un nombre de kilomètres valide."),
-                              duration: Duration(seconds: 2), // Durée du SnackBar
-                            ),
-                          );
-                        }
-
-                        if (_priceController.text.isNotEmpty) {
-                          
-                          prix = _priceController.text;
-
-                        } else {
-
-                          insertValue = false;
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Veuillez entrer un prix valide."),
-                              duration: Duration(seconds: 2), // Durée du SnackBar
-                            ),
-                          );
-                        }
-                      } else {
-                        if (kilometers == 0) {
-                          insertValue = false;
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text("Veuillez entrer un nombre de kilomètres valide."),
-                              duration: Duration(seconds: 2), // Durée du SnackBar
-                            ),
-                          );
-                        } else {km = kilometers;}
-                        
-                      }
-
-                      if (insertValue) {
-                        insertKm(selectedDate, showCustomFields, km, prix);
-                      }
-                    },
+                    onPressed: _saveKilometersToFirebase,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      backgroundColor: Colors.blueAccent,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     child: const Text(
                       "Valider",
                       style: TextStyle(
-                        color: Color.fromARGB(255, 0, 0, 0),
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
-                  const Text(
-                    "Valeurs ajoutées :",
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  ...addedValues.map((value) => Text(
-                    value,
-                    style: const TextStyle(color: Colors.white),
-                  )),
                 ],
               ),
             ),
@@ -316,32 +190,4 @@ class _KmPageState extends State<KmPage> {
       ),
     );
   }
-}
-
-Future<void> insertKm(DateTime  dateTime, bool showCustomFields, int km, String prix) async {
-  CollectionReference noteFrais = FirebaseFirestore.instance.collection('noteFrais');
-  
-  String date = "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
-  
-  DateTime dateTimeNow = DateTime.now();
-  String heure = "${dateTimeNow.hour.toString().padLeft(2, '0')}:${dateTimeNow.minute.toString().padLeft(2, '0')}:${dateTimeNow.second.toString().padLeft(2, '0')}";
-  String montant = "0";
-  
-  // Données à insérer
-  try {
-    if (showCustomFields) {
-
-      montant = prix;
-
-    } else { montant = (km * 1.10).toStringAsFixed(2);}
-
-    await noteFrais.add({
-        'type': 'Trajet',
-        'dateOperation': date,
-        'heureValidation': heure,
-        'montant': montant,
-        'kilometres': km.toString(),
-      });
-
-  } catch (e) {}
 }

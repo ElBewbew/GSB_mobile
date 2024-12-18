@@ -64,7 +64,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/km.png
+    - assets/images/trajet.png
     - assets/images/repas.png
     - assets/images/nuits.png
     - assets/images/etapes.png
